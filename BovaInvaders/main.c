@@ -6,7 +6,13 @@
 //
 
 #include <stdio.h>
+#include "game.h"
 
 int main(int argc, const char * argv[]) {
-    return 0;
+    
+    if (game_init()) {
+        game_loop();
+    }
+    
+    return game_close();
 }

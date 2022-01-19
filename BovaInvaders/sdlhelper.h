@@ -3,12 +3,12 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 
-#define SCREEN_WIDTH 500
-#define SCREEN_HEIGHT 647
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
 
-int sdl_init();
-int sdl_close();
-SDL_Renderer* getMainRenderer();
+int sdl_init(void);
+int sdl_close(void);
+SDL_Renderer* getMainRenderer(void);
 SDL_Surface* loadBitmapSurfaceFromPath(char path[]);
 SDL_Texture* loadTextureFromPath(char path[]);
 #endif
