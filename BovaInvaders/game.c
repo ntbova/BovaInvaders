@@ -14,8 +14,11 @@ int game_init()
 int game_loop()
 {
 	int gameRunning = 1;
-	SDL_Texture* gameBoardTexture = loadTextureFromPath("");
-
+	SDL_Texture* spaceShipTexture = loadTextureFromPath("Resources/space_ship.bmp");
+    SDL_Rect spaceShipRect;
+    spaceShipRect.h = SPACE_SHIP_HEIGHT; spaceShipRect.w = SPACE_SHIP_WIDTH;
+    spaceShipRect.x = SCREEN_WIDTH / 2; spaceShipRect.y = SCREEN_HEIGHT - SPACE_SHIP_HEIGHT;
+    
 	SDL_Event e;
 
 	while (gameRunning)
@@ -33,6 +36,12 @@ int game_loop()
 					case SDLK_ESCAPE:
 						gameRunning = 0;
 						break;
+                    case SDLK_LEFT:
+                        if (spaceShipRect.x > 0) { spaceShipRect.x = spaceShipRect.x - SPACE_SHIP_SPEED; }
+                        break;
+                    case SDLK_RIGHT:
+                        if (spaceShipRect.x < SCREEN_WIDTH - SPACE_SHIP_WIDTH) { spaceShipRect.x = spaceShipRect.x + SPACE_SHIP_SPEED; }
+                        break;
 				}
 			}
 
@@ -41,7 +50,7 @@ int game_loop()
 			SDL_RenderClear(mainRenderer);
 
 			// Render board to the screen
-			SDL_RenderCopy(mainRenderer, gameBoardTexture, NULL, NULL);
+			SDL_RenderCopy(mainRenderer, spaceShipTexture, NULL, &spaceShipRect);
 
 			// Update screen
 			SDL_RenderPresent(mainRenderer);
