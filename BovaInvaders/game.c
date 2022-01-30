@@ -36,25 +36,32 @@ int game_loop()
 					case SDLK_ESCAPE:
 						gameRunning = 0;
 						break;
-                    case SDLK_LEFT:
-                        if (spaceShipRect.x > 0) { spaceShipRect.x = spaceShipRect.x - SPACE_SHIP_SPEED; }
-                        break;
-                    case SDLK_RIGHT:
-                        if (spaceShipRect.x < SCREEN_WIDTH - SPACE_SHIP_WIDTH) { spaceShipRect.x = spaceShipRect.x + SPACE_SHIP_SPEED; }
-                        break;
 				}
 			}
-
-			SDL_Renderer* mainRenderer = getMainRenderer();
-			// Clear screen
-			SDL_RenderClear(mainRenderer);
-
-			// Render board to the screen
-			SDL_RenderCopy(mainRenderer, spaceShipTexture, NULL, &spaceShipRect);
-
-			// Update screen
-			SDL_RenderPresent(mainRenderer);
 		}
+        
+        // Handle keystate of user inputs here
+        const Uint8* currentKeyStates = SDL_GetKeyboardState( NULL );
+        if(currentKeyStates[ SDL_SCANCODE_LEFT ])
+        {
+            // Move ship left unless it's at the left edge of the screen
+            if (spaceShipRect.x > 0) { spaceShipRect.x = spaceShipRect.x - SPACE_SHIP_SPEED; }
+        }
+        if (currentKeyStates[ SDL_SCANCODE_RIGHT ])
+        {
+            // Move ship right unless it's at the right edge of the screen
+            if (spaceShipRect.x < SCREEN_WIDTH - SPACE_SHIP_WIDTH) { spaceShipRect.x = spaceShipRect.x + SPACE_SHIP_SPEED; }
+        }
+        
+        SDL_Renderer* mainRenderer = getMainRenderer();
+        // Clear screen
+        SDL_RenderClear(mainRenderer);
+
+        // Render board to the screen
+        SDL_RenderCopy(mainRenderer, spaceShipTexture, NULL, &spaceShipRect);
+
+        // Update screen
+        SDL_RenderPresent(mainRenderer);
 	}
 
 	return 1;
