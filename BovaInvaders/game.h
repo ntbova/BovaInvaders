@@ -20,6 +20,5 @@ typedef struct GameStates {
 
 int game_init(GameState*);
 int game_loop(void);
-void render_loop(void);
 int game_close(void);
 #endif

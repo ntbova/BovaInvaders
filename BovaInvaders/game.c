@@ -65,7 +65,7 @@ int game_loop() {
         }
         if (currentKeyStates[ SDL_SCANCODE_SPACE ]) {
             // If we haven't reached the max
-            if (totalGameTime - bulletTime > BULLET_DELAY)
+             if (totalGameTime - bulletTime > BULLET_DELAY)
             {
                 for (int i = 0; i < NUM_BULLETS; i++) {
                     if (state.bullet_pos_x[i] == INT32_MIN && state.bullet_pos_y[i] == INT32_MIN) {
@@ -85,6 +85,17 @@ int game_loop() {
             if (state.bullet_pos_x[i] != INT32_MIN && state.bullet_pos_y[i] != INT32_MIN) {
                 state.bullet_pos_y[i] = state.bullet_pos_y[i] - BULLET_SPEED;
                 if (state.bullet_pos_y[i] < -SPACE_SHIP_HEIGHT) {
+                    state.bullet_pos_x[i] = INT32_MIN; state.bullet_pos_y[i] = INT32_MIN;
+                }
+            }
+        }
+        
+        // After moving bullets, check to see if any have collided with the enemies, remove
+        // enemies from screen if they do
+        for (int i = 0; i < NUM_BULLETS; i++) {
+            for (int j = 0; j < NUM_ENEMIES; j++) {
+                if (check_collision(assets.bulletRects[i], assets.enemyRects[j]) == 1) {
+                    state.enemy_pos_x[j] = INT32_MAX; state.enemy_pos_y[j] = INT32_MAX;
                     state.bullet_pos_x[i] = INT32_MIN; state.bullet_pos_y[i] = INT32_MIN;
                 }
             }

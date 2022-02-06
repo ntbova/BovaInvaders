@@ -30,5 +30,6 @@ typedef struct RenderAssetsStruct {
 } RenderAssets;
 
 int render_init(RenderAssets*, GameState*);
+int check_collision(SDL_Rect, SDL_Rect);
 void render_game_state(RenderAssets*);
 #endif /* render_h */
