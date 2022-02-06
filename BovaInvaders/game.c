@@ -1,30 +1,24 @@
-#include "sdlhelper.h"
 #include "game.h"
+#include "render.h"
 
-int game_init() {
-	if (sdl_init() == 0) {
-		return 0;
-	}
-    
+int game_init(GameState* state) {
+    state->ship_pos_x = SCREEN_WIDTH / 2; state->ship_pos_y = SCREEN_HEIGHT - SPACE_SHIP_HEIGHT;
+    for (int i = 0; i < NUM_BULLETS; i++) {
+        state->bullet_pos_x[i] = INT32_MIN; state->bullet_pos_y[i] = INT32_MIN;
+    }
     return 1;
 }
 
 int game_loop() {
     // Game assets/variables
 	int gameRunning = 1;
-	SDL_Texture* spaceShipTexture = loadTextureFromPath("Resources/space_ship.bmp");
-    SDL_Texture* shipBulletTexture = loadTextureFromPath("Resources/ship_bullet.bmp");
-    SDL_Rect spaceShipRect;
-    spaceShipRect.h = SPACE_SHIP_HEIGHT; spaceShipRect.w = SPACE_SHIP_WIDTH;
-    spaceShipRect.x = SCREEN_WIDTH / 2; spaceShipRect.y = SCREEN_HEIGHT - SPACE_SHIP_HEIGHT;
-    // Allow up to two bullets on screen (Will change this at some point to have an array of
-    // arbitrary bullets on screen so that I change the amount as a settings whenever I want
-    SDL_Rect shipBulletOneRect, shipBulletTwoRect;
-    shipBulletOneRect.h = SPACE_SHIP_HEIGHT; shipBulletOneRect.w = SPACE_SHIP_WIDTH;
-    shipBulletOneRect.x = INT32_MIN; shipBulletOneRect.y = INT32_MIN;
-    shipBulletTwoRect.h = SPACE_SHIP_HEIGHT; shipBulletTwoRect.w = SPACE_SHIP_WIDTH;
-    shipBulletTwoRect.x = INT32_MIN; shipBulletTwoRect.y = INT32_MIN;
-    Uint32 totalGameTime = 0, bulletOneTime = 0, bulletTwoTime = 0;
+    GameState state; RenderAssets assets;
+    // Initialize game state
+    game_init(&state);
+    // Initialize render assets through render_init, using game state values
+    render_init(&assets, &state);
+    
+    Uint32 totalGameTime = 0, bulletTime = 0;
     
 	SDL_Event e;
 
@@ -50,56 +44,49 @@ int game_loop() {
         const Uint8* currentKeyStates = SDL_GetKeyboardState( NULL );
         if(currentKeyStates[ SDL_SCANCODE_LEFT ]) {
             // Move ship left unless it's at the left edge of the screen
-            if (spaceShipRect.x > 0) { spaceShipRect.x = spaceShipRect.x - SPACE_SHIP_SPEED; }
+            if (state.ship_pos_x > 0) { state.ship_pos_x = state.ship_pos_x - SPACE_SHIP_SPEED; }
         }
         if (currentKeyStates[ SDL_SCANCODE_RIGHT ]) {
             // Move ship right unless it's at the right edge of the screen
-            if (spaceShipRect.x < SCREEN_WIDTH - SPACE_SHIP_WIDTH) { spaceShipRect.x = spaceShipRect.x + SPACE_SHIP_SPEED; }
+            if (state.ship_pos_x < SCREEN_WIDTH - SPACE_SHIP_WIDTH) { state.ship_pos_x = state.ship_pos_x + SPACE_SHIP_SPEED; }
         }
         if (currentKeyStates[ SDL_SCANCODE_SPACE ]) {
-            // If there are no bullets on screen, reset the position of first one to above where
-            // the space ship is
-            if (shipBulletOneRect.x == INT32_MIN && shipBulletOneRect.y == INT32_MIN) {
-                shipBulletOneRect.x = spaceShipRect.x; shipBulletOneRect.y = SCREEN_HEIGHT - (SPACE_SHIP_HEIGHT * 2);
-                bulletOneTime = SDL_GetTicks();
-            }
-            // Else, set the second bullet to to where the space ship is (don't fire second shot until
-            // enough time has passed since the first shot
-            else if (shipBulletTwoRect.x == INT32_MIN && shipBulletTwoRect.y == INT32_MIN
-                     && SDL_GetTicks() - bulletOneTime > BULLET_DELAY) {
-                shipBulletTwoRect.x = spaceShipRect.x; shipBulletTwoRect.y = SCREEN_HEIGHT - (SPACE_SHIP_HEIGHT * 2);
-                bulletTwoTime = SDL_GetTicks();
+            // If we haven't reached the max
+            if (totalGameTime - bulletTime > BULLET_DELAY)
+            {
+                for (int i = 0; i < NUM_BULLETS; i++) {
+                    if (state.bullet_pos_x[i] == INT32_MIN && state.bullet_pos_y[i] == INT32_MIN) {
+                        state.bullet_pos_x[i] = state.ship_pos_x;
+                        state.bullet_pos_y[i] = SCREEN_HEIGHT - (SPACE_SHIP_HEIGHT * 2);
+                        bulletTime = SDL_GetTicks();
+                        break;
+                    }
+                }
             }
             // Otherwise don't shoot any more bullets
         }
         
-        // If bullets are on screen, make sure to make them move up the screen until they are no longer visible
-        if (bulletOneTime != 0) {
-            shipBulletOneRect.y = shipBulletOneRect.y - BULLET_SPEED;
-            if (shipBulletOneRect.y < -SPACE_SHIP_HEIGHT) {
-                shipBulletOneRect.x = INT32_MIN; shipBulletOneRect.y = INT32_MIN;
-                bulletOneTime = 0;
-            }
-        }
-        if (bulletTwoTime != 0) {
-            shipBulletTwoRect.y = shipBulletTwoRect.y - BULLET_SPEED;
-            if (shipBulletTwoRect.y < -SPACE_SHIP_HEIGHT) {
-                shipBulletTwoRect.x = INT32_MIN; shipBulletTwoRect.y = INT32_MIN;
-                bulletTwoTime = 0;
+        // Go over each bullet. If there are any on screen, keep them moving. If they move off screen,
+        // then set there position to int min.
+        for (int i = 0; i < NUM_BULLETS; i++) {
+            if (state.bullet_pos_x[i] != INT32_MIN && state.bullet_pos_y[i] != INT32_MIN) {
+                state.bullet_pos_y[i] = state.bullet_pos_y[i] - BULLET_SPEED;
+                if (state.bullet_pos_y[i] < -SPACE_SHIP_HEIGHT) {
+                    state.bullet_pos_x[i] = INT32_MIN; state.bullet_pos_y[i] = INT32_MIN;
+                }
             }
         }
         
-        SDL_Renderer* mainRenderer = getMainRenderer();
-        // Clear screen
-        SDL_RenderClear(mainRenderer);
-
-        // Render board to the screen
-        SDL_RenderCopy(mainRenderer, spaceShipTexture, NULL, &spaceShipRect);
-        SDL_RenderCopy(mainRenderer, shipBulletTexture, NULL, &shipBulletOneRect);
-        SDL_RenderCopy(mainRenderer, shipBulletTexture, NULL, &shipBulletTwoRect);
-
-        // Update screen
-        SDL_RenderPresent(mainRenderer);
+        // Modify render assets based on current state
+        assets.shipRect.x = state.ship_pos_x;
+        assets.shipRect.y = state.ship_pos_y;
+        
+        for (int i = 0; i < NUM_BULLETS; i++) {
+            assets.bulletRects[i].x = state.bullet_pos_x[i];
+            assets.bulletRects[i].y = state.bullet_pos_y[i];
+        }
+        // Render using render assets
+        render_game_state(&assets);
 	}
 
 	return 1;
