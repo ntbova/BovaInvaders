@@ -6,6 +6,7 @@
 #define ENEMY_SPEED 4
 #define NUM_BULLETS 3
 #define NUM_ENEMIES 30
+#define NUM_ENEMIES_COL 6
 #define BULLET_DELAY 500
 
 typedef struct GameStates {

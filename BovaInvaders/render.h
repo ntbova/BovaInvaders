@@ -13,8 +13,12 @@
 
 #define SPACE_SHIP_WIDTH 50
 #define SPACE_SHIP_HEIGHT 50
+#define ENEMY_WIDTH 50
+#define ENEMY_HEIGHT 50
 #define BULLET_WIDTH 10
 #define BULLET_HEIGHT 20
+#define ENEMY_GRID_MARGIN 50
+#define ENEMY_MARGIN 20
 
 typedef struct RenderAssetsStruct {
     SDL_Texture* shipTexture;

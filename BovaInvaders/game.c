@@ -6,6 +6,19 @@ int game_init(GameState* state) {
     for (int i = 0; i < NUM_BULLETS; i++) {
         state->bullet_pos_x[i] = INT32_MIN; state->bullet_pos_y[i] = INT32_MIN;
     }
+    // Set up position of enemies based on grid margin, enemy size, and number of enemies
+    // per row and per column
+    int currX = ENEMY_GRID_MARGIN, currY = 0;
+    for (int i = 0; i < NUM_ENEMIES; i++) {
+        if (i % NUM_ENEMIES_COL == 0) {
+            currX = ENEMY_GRID_MARGIN; currY = currY + ENEMY_HEIGHT;
+        }
+        else {
+            currX = currX + ENEMY_WIDTH + ENEMY_MARGIN;
+        }
+        state->enemy_pos_x[i] = currX;
+        state->enemy_pos_y[i] = currY;
+    }
     return 1;
 }
 
@@ -84,6 +97,10 @@ int game_loop() {
         for (int i = 0; i < NUM_BULLETS; i++) {
             assets.bulletRects[i].x = state.bullet_pos_x[i];
             assets.bulletRects[i].y = state.bullet_pos_y[i];
+        }
+        for (int i = 0; i < NUM_ENEMIES; i++) {
+            assets.enemyRects[i].x = state.enemy_pos_x[i];
+            assets.enemyRects[i].y = state.enemy_pos_y[i];
         }
         // Render using render assets
         render_game_state(&assets);
