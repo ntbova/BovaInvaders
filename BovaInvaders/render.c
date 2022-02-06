@@ -20,7 +20,7 @@ int render_init(RenderAssets* assets, GameState* state) {
     // Allow up to two bullets on screen (Will change this at some point to have an array of
     // arbitrary bullets on screen so that I change the amount as a settings whenever I want
     for (int i = 0; i < NUM_BULLETS; i++) {
-        assets->bulletRects[i].h = SPACE_SHIP_HEIGHT; assets->bulletRects[i].w = SPACE_SHIP_WIDTH;
+        assets->bulletRects[i].h = BULLET_HEIGHT; assets->bulletRects[i].w = BULLET_WIDTH;
         assets->bulletRects[i].x = state->bullet_pos_x[i]; assets->bulletRects[i].y = state->bullet_pos_y[i];
     }
     

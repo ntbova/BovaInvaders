@@ -56,8 +56,8 @@ int game_loop() {
             {
                 for (int i = 0; i < NUM_BULLETS; i++) {
                     if (state.bullet_pos_x[i] == INT32_MIN && state.bullet_pos_y[i] == INT32_MIN) {
-                        state.bullet_pos_x[i] = state.ship_pos_x;
-                        state.bullet_pos_y[i] = SCREEN_HEIGHT - (SPACE_SHIP_HEIGHT * 2);
+                        state.bullet_pos_x[i] = state.ship_pos_x + (SPACE_SHIP_WIDTH / 2);
+                        state.bullet_pos_y[i] = SCREEN_HEIGHT - (SPACE_SHIP_HEIGHT);
                         bulletTime = SDL_GetTicks();
                         break;
                     }

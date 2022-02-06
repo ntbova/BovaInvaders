@@ -1,12 +1,10 @@
 #ifndef GAME_H
 #define GAME_H
 
-#define SPACE_SHIP_WIDTH 50
-#define SPACE_SHIP_HEIGHT 50
 #define SPACE_SHIP_SPEED 2
 #define BULLET_SPEED 4
 #define ENEMY_SPEED 4
-#define NUM_BULLETS 2
+#define NUM_BULLETS 3
 #define NUM_ENEMIES 30
 #define BULLET_DELAY 500
 
